@@ -1,0 +1,56 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowCredentials: true
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTIONS
+            allowedHeaders: "*"
+      routes:
+        - id: patient
+          uri: ${SPRING_APPLICATION_PATIENT_URL}
+          predicates:
+          - Path=/patients, /patients/{id}
+        - id: note-get
+          uri: ${SPRING_APPLICATION_NOTE_URL}
+          predicates:
+            - Path=/patients/{id}/notes
+            - Method=GET
+          filters:
+            - RewritePath=/patients/(?<id>.*)/notes, /notes/patId/$\{id}
+        - id: note-post
+          uri: ${SPRING_APPLICATION_NOTE_URL}
+          predicates:
+            - Path=/patients/{id}/notes
+            - Method=POST
+          filters:
+            - RewritePath=/patients/(?<id>.*)/notes, /notes
+        - id: risk
+          uri: ${SPRING_APPLICATION_RISK_URL}
+          predicates:
+            - Path=/patients/{id}/risk
+          filters:
+            - RewritePath=/patients/(?<id>.*)/risk, /risk/$\{id}
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${SPRING_EUREKA_URL}
+
+
