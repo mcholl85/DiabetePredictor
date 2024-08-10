@@ -1,0 +1,22 @@
+eureka:
+  client:
+    enabled: false
+medilabo:
+  api:
+    url: http://localhost:8080/patients
+risk:
+  terms:
+    - "Hémoglobine A1C"
+    - "Microalbumine"
+    - "Taille"
+    - "Poids"
+    - "Fumeur"
+    - "Fumeuse"
+    - "Anormal"
+    - "Cholestérol"
+    - "Vertiges"
+    - "Rechute"
+    - "Réaction"
+    - "Anticorps"
+server:
+  port: 6002
