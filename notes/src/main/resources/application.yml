@@ -1,0 +1,17 @@
+server:
+  port: ${SERVER_PORT}
+spring:
+  application.name: notes
+  data:
+    mongodb:
+      host: ${MONGO_DATASOURCE_HOST}
+      port: ${MONGO_DATASOURCE_PORT}
+      database: ${MONGO_DATASOURCE_NAME}
+      username: ${MONGO_DATASOURCE_USERNAME}
+      password: ${MONGO_DATASOURCE_PASSWORD}
+eureka:
+  client:
+    serviceUrl:
+      register-with-eureka: true
+      fetch-registry: true
+      defaultZone: ${SPRING_EUREKA_URL}
