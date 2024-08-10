@@ -1,0 +1,12 @@
+spring.application.name: eureka-server
+server.port: 8761
+eureka:
+  client:
+    serviceUrl.defaultZone: ${SPRING_EUREKA_URL}
+    register-with-eureka: false
+    fetch-registry: false
+management:
+  endpoint:
+    health.show-details: always
+  endpoints:
+    web.exposure.include: health
