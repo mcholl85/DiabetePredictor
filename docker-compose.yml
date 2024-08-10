@@ -1,0 +1,133 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: patientdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./backend-patient/src/main/resources/data/:/docker-entrypoint-initdb.d/
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - medilabo-network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: notes
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./notes/src/main/resources/data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - mongodb_data:/data/db/
+    networks:
+      - medilabo-network
+
+  eureka:
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    networks:
+      - medilabo-network
+
+  patients:
+    build:
+      context: ./backend-patient
+      dockerfile: Dockerfile
+    container_name: patients
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patientdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVER_PORT: 5001
+      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka
+      - postgres
+    networks:
+      - medilabo-network
+
+  notes:
+    build:
+      context: ./notes
+      dockerfile: Dockerfile
+    container_name: notes
+    environment:
+      SERVER_PORT: 4001
+      MONGO_DATASOURCE_HOST: mongodb
+      MONGO_DATASOURCE_NAME: patients
+      MONGO_DATASOURCE_PASSWORD: password
+      MONGO_DATASOURCE_PORT: 27017
+      MONGO_DATASOURCE_USERNAME: user
+      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka
+      - mongodb
+    networks:
+      - medilabo-network
+
+  risk:
+    build:
+      context: ./risk
+      dockerfile: Dockerfile
+    container_name: risk
+    environment:
+      SERVER_PORT: 6001
+      API_GATEWAY_URL: http://gateway:8080/
+      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka
+    networks:
+      - medilabo-network
+
+  gateway:
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    build:
+      context: ./cloud-gateway
+      dockerfile: Dockerfile
+    environment:
+      SPRING_APPLICATION_PATIENT_URL: http://patients:5001/
+      SPRING_APPLICATION_NOTE_URL: http://notes:4001/
+      SPRING_APPLICATION_RISK_URL: http://risk:6001/
+      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka
+      - patients
+      - notes
+      - risk
+    networks:
+      - medilabo-network
+
+  nextjs:
+    build:
+      context: ./client-ui
+      dockerfile: Dockerfile
+    container_name: nextjs
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    networks:
+      - medilabo-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  medilabo-network:
+    name: medilabo-network
+    driver: bridge
