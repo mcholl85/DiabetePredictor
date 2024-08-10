@@ -2,6 +2,7 @@ package com.medilabo.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medilabo.patient.config.TestSecurityConfig;
+import com.medilabo.patient.model.Gender;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.service.PatientService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PatientController.class)
 @Import(TestSecurityConfig.class)
+@ActiveProfiles("test")
 public class PatientControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +49,7 @@ public class PatientControllerTest {
                 .firstName("Jean")
                 .lastName("Moulin")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678900")
                 .build();
@@ -79,7 +82,7 @@ public class PatientControllerTest {
                 .firstName("Marie")
                 .lastName("Curie")
                 .birthDate(LocalDate.of(1867, 11, 7))
-                .gender("F")
+                .gender(Gender.F)
                 .address("3 rue Pierre et Marie Curie")
                 .phone("0654321987")
                 .build();
@@ -100,7 +103,7 @@ public class PatientControllerTest {
                 .firstName("Jean")
                 .lastName("Valjean")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678900")
                 .build();

@@ -2,6 +2,7 @@ package com.medilabo.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medilabo.patient.config.TestSecurityConfig;
+import com.medilabo.patient.model.Gender;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ public class PatientControllerIntegrationTest {
                 .firstName("Jean")
                 .lastName("Moulin")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678900")
                 .build();
@@ -61,7 +62,7 @@ public class PatientControllerIntegrationTest {
                 .firstName("Marie")
                 .lastName("Curie")
                 .birthDate(LocalDate.of(1867, 11, 7))
-                .gender("F")
+                .gender(Gender.F)
                 .address("3 rue Pierre et Marie Curie")
                 .phone("0654321987")
                 .build();
@@ -87,7 +88,7 @@ public class PatientControllerIntegrationTest {
                 .firstName("Marie")
                 .lastName("Curie")
                 .birthDate(LocalDate.of(1867, 11, 7))
-                .gender("F")
+                .gender(Gender.F)
                 .address("3 rue Pierre et Marie Curie")
                 .phone("0654321987")
                 .build();
@@ -107,7 +108,7 @@ public class PatientControllerIntegrationTest {
                 .firstName("Jean")
                 .lastName("Valjean")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678900")
                 .build();

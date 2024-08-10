@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.medilabo.patient.exception.PatientNotFoundException;
+import com.medilabo.patient.model.Gender;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.repository.PatientRepository;
 
@@ -39,7 +40,7 @@ public class PatientServiceTest {
                 .firstName("Jean")
                 .lastName("Moulin")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678900")
                 .build();
@@ -85,7 +86,7 @@ public class PatientServiceTest {
                 .firstName("Marie")
                 .lastName("Curie")
                 .birthDate(LocalDate.of(1867, 11, 7))
-                .gender("F")
+                .gender(Gender.F)
                 .address("3 rue Pierre et Marie Curie")
                 .phone("0654321987")
                 .build();
@@ -104,7 +105,7 @@ public class PatientServiceTest {
                 .firstName("Jean")
                 .lastName("Moulin")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678901")
                 .build();
@@ -126,7 +127,7 @@ public class PatientServiceTest {
                 .firstName("Jean")
                 .lastName("Moulin")
                 .birthDate(LocalDate.of(1940, 5, 20))
-                .gender("H")
+                .gender(Gender.M)
                 .address("2 rue de la République")
                 .phone("0645678901")
                 .build();
