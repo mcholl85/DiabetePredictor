@@ -35,11 +35,19 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
+    environment:
+      SPRING_EUREKA_URL: http://localhost:8761/eureka/
     build:
       context: ./eureka-server
       dockerfile: Dockerfile
     networks:
       - medilabo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   patients:
     build:
@@ -53,8 +61,10 @@ services:
       SERVER_PORT: 5001
       SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
     depends_on:
-      - eureka
-      - postgres
+      eureka:
+        condition: service_healthy
+      postgres:
+        condition: service_started
     networks:
       - medilabo-network
 
@@ -72,8 +82,10 @@ services:
       MONGO_DATASOURCE_USERNAME: user
       SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
     depends_on:
-      - eureka
-      - mongodb
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
     networks:
       - medilabo-network
 
@@ -87,7 +99,8 @@ services:
       API_GATEWAY_URL: http://gateway:8080/
       SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
     depends_on:
-      - eureka
+      eureka:
+        condition: service_healthy
     networks:
       - medilabo-network
 
@@ -104,10 +117,14 @@ services:
       SPRING_APPLICATION_RISK_URL: http://risk:6001/
       SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
     depends_on:
-      - eureka
-      - patients
-      - notes
-      - risk
+      eureka:
+        condition: service_healthy
+      patients:
+        condition: service_started
+      notes:
+        condition: service_started
+      risk:
+        condition: service_started
     networks:
       - medilabo-network
 
