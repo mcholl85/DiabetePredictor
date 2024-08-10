@@ -1,4 +1,4 @@
-import {Card, Textarea} from "flowbite-react";
+import {Card, Spinner, Textarea} from "flowbite-react";
 import React, {useState} from "react";
 import {useNote} from "@/hooks/useNotes";
 import NoteForm from "@/components/NoteForm";
@@ -9,19 +9,11 @@ interface NoteDetailProps {
 }
 
 const NoteDetail: React.FC<NoteDetailProps> = ({patId, patient}) => {
-    const {data, isLoading, isError, error} = useNote(patId);
+    const {data, isLoading} = useNote(patId);
     const [formIsOpen, setFormIsOpen] = useState<boolean>(false);
 
     const closeForm = () => {
         setFormIsOpen(false);
-    }
-
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
     }
 
     return (<Card className="max-w-2xl mx-auto mt-1">
@@ -39,7 +31,13 @@ const NoteDetail: React.FC<NoteDetailProps> = ({patId, patient}) => {
                 </svg>
             </button>
         </div>
-        {data?.map((note, count) => (
+        {isLoading ? <div className="text-center">
+            <Spinner
+                color="info"
+                aria-label="Center-aligned spinner example"
+                size="xl"
+            />
+        </div> : data?.map((note, count) => (
             <div key={note.id}>
                 <Textarea id="note" value={note.note} readOnly rows={4} disabled/>
             </div>
