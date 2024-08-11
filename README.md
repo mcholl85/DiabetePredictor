@@ -1,21 +1,13 @@
-# Microservices Application DiabetePredictor with Docker Compose
+# Microservices Application DiabetePredictor
 
-This project contains a microservices-based architecture using Spring Boot and Docker. The application includes services for managing patients, notes, risk analysis, and a client UI built with Next.js. Each service is containerized using Docker and orchestrated with Docker Compose.
+This project implements a microservices architecture using Spring Cloud for centralized configuration management and Eureka for service discovery. Each microservice is containerized using Docker and orchestrated with Docker Compose.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-- [Setup and Installation](#setup-and-installation)
-- [Services](#services)
-    - [PostgreSQL](#postgresql)
-    - [MongoDB](#mongodb)
-    - [Eureka Server](#eureka-server)
-    - [Patients Service](#patients-service)
-    - [Notes Service](#notes-service)
-    - [Risk Service](#risk-service)
-    - [API Gateway](#api-gateway)
-    - [Client UI](#client-ui)
+- [Prerequisites](#prerequisites)
+- [Configuration](#configuration)
 - [Network](#network)
 - [Volumes](#volumes)
 - [Health Checks](#health-checks)
@@ -24,7 +16,15 @@ This project contains a microservices-based architecture using Spring Boot and D
 
 ## Overview
 
-This project demonstrates a typical microservices setup with various independent services communicating through a centralized service registry (Eureka Server). Each service is deployed as a Docker container. This setup is ideal for development, testing, and production deployment.
+- **PostgreSQL**: Database for patient data.
+- **MongoDB**: Database for notes.
+- **Eureka Server**: Service discovery server.
+- **Config Server**: Centralized configuration management.
+- **Patients Service**: Microservice for managing patients.
+- **Notes Service**: Microservice for note-taking.
+- **Risk Service**: Microservice for risk assessment.
+- **API Gateway**: Routes requests to the appropriate services.
+- **Next.js**: Frontend application.
 
 ## Architecture
 
@@ -34,9 +34,12 @@ This project demonstrates a typical microservices setup with various independent
 -	API Gateway: A centralized gateway to route requests to the respective services.
 -	Client UI: A Next.js-based user interface.
 
-## Setup and Installation
+## Prerequisites
 
-Ensure you have Docker and Docker Compose installed on your machine before proceeding.
+Before starting, ensure you have the following installed:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Steps to Run the Application
 
@@ -56,94 +59,20 @@ docker-compose up --build
 - API Gateway: http://localhost:8080/patients
 - Eureka Dashboard: http://localhost:8761
 
-### Services
+### Configuration
 
-#### PostgreSQL
-
-- Image: postgres:latest
-- Ports: 5432:5432
-- Environment Variables:
-  - POSTGRES_USER: user
-  - POSTGRES_PASSWORD: password
-  - POSTGRES_DB: patientdb
-- Volumes:
-  - ./backend-patient/src/main/resources/data/ to /docker-entrypoint-initdb.d/
-  - postgres_data for persistent storage
-
-#### MongoDB
-
-- Image: mongo
-- Ports: 27017:27017
-- Environment Variables:
-  - MONGO_INITDB_ROOT_USERNAME: user
-  - MONGO_INITDB_ROOT_PASSWORD: password
-  - MONGO_INITDB_DATABASE: notes
-- Volumes:
-  - ./notes/src/main/resources/data/mongo-init.js to /docker-entrypoint-initdb.d/mongo-init.js
-  - mongodb_data for persistent storage
-
-#### Eureka Server
-
-- Container Name: eureka-server
-- Ports: 8761:8761
-- Environment Variables:
-  - SPRING_EUREKA_URL: http://localhost:8761/eureka/
-- Healthcheck:
-  - URL: http://localhost:8761/actuator/health
-
-#### Patients Service
-
-- Build Context: ./backend-patient
-- Ports: Exposed internally at 5001
-- Environment Variables:
-  - SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patientdb
-  - SPRING_DATASOURCE_USERNAME: user
-  - SPRING_DATASOURCE_PASSWORD: password
-  - SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
-- Dependencies:
-  - Waits for PostgreSQL and Eureka to be ready
-
-#### Notes Service
-
-- Build Context: ./notes
-- Ports: Exposed internally at 4001
-- Environment Variables:
-  - MONGO_DATASOURCE_HOST: mongodb
-  - MONGO_DATASOURCE_NAME: notes
-  - MONGO_DATASOURCE_USERNAME: user
-  - MONGO_DATASOURCE_PASSWORD: password
-  - SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
-- Dependencies:
-  - Waits for MongoDB and Eureka to be ready
-
-#### Risk Service
-
-- Build Context: ./risk
-- Ports: Exposed internally at 6001
-- Environment Variables:
-  - API_GATEWAY_URL: http://gateway:8080/
-  - SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
-- Dependencies:
-  - Waits for Eureka to be ready
-
-#### API Gateway
-
-- Build Context: ./cloud-gateway
-- Ports: 8080:8080
-- Environment Variables:
-  - SPRING_APPLICATION_PATIENT_URL: http://patients:5001/
-  - SPRING_APPLICATION_NOTE_URL: http://notes:4001/
-  - SPRING_APPLICATION_RISK_URL: http://risk:6001/
-  - SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
-- Dependencies:
-  - Waits for all services to be ready
-
-#### Client UI
-
-- Build Context: ./client-ui
-- Ports: 3000:3000
-- Environment Variables:
-  - NEXT_PUBLIC_API_URL: http://localhost:8080
+#### Spring Cloud Config
+The services are configured to use the centralized configuration server :
+```
+spring:
+  application:
+    name: <microservice-name>
+  cloud:
+    config:
+      uri: http://${CONFIG_SERVER_URL}:${CONFIG_SERVER_PORT}
+      username: ${SPRING_SECURITY_USERNAME}
+      password: ${SPRING_SECURITY_PASSWORD}
+```
 
 ### Network
 
@@ -156,7 +85,11 @@ All services communicate over a single Docker bridge network named medilabo-netw
 
 ### Health Checks
 
-- Eureka Server includes a health check endpoint at http://localhost:8761/actuator/health.
+Health checks are configured to ensure critical services are functioning correctly:
+
+- Eureka Server: http://localhost:8761/actuator/health
+- Config Server: http://localhost:9101/actuator/health
+
 
 ### Contributing
 
