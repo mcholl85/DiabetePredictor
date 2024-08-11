@@ -1,26 +1,4 @@
-spring.application.name: risk
-eureka:
-  client:
-    serviceUrl:
-      register-with-eureka: true
-      fetch-registry: true
-      defaultZone: ${SPRING_EUREKA_URL}
-medilabo:
-  api:
-    url: ${API_GATEWAY_URL}
-risk:
-  terms:
-    - "Hémoglobine A1C"
-    - "Microalbumine"
-    - "Taille"
-    - "Poids"
-    - "Fumeur"
-    - "Fumeuse"
-    - "Anormal"
-    - "Cholestérol"
-    - "Vertiges"
-    - "Rechute"
-    - "Réaction"
-    - "Anticorps"
-server:
-  port: ${SERVER_PORT}
+spring:
+  application.name: risk
+  config:
+    import: optional:configserver:http://${SPRING_SECURITY_USERNAME}:${SPRING_SECURITY_PASSWORD}@${CONFIG_SERVER_URL}:${CONFIG_SERVER_PORT}
