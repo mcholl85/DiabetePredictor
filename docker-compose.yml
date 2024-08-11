@@ -35,8 +35,14 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
+    depends_on:
+      config:
+        condition: service_healthy
     environment:
-      SPRING_EUREKA_URL: http://localhost:8761/eureka/
+      CONFIG_SERVER_URL: config
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
     build:
       context: ./eureka-server
       dockerfile: Dockerfile
@@ -55,12 +61,13 @@ services:
       dockerfile: Dockerfile
     container_name: patients
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patientdb
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SERVER_PORT: 5001
-      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URL: config
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
     depends_on:
+      config:
+        condition: service_healthy
       eureka:
         condition: service_healthy
       postgres:
@@ -74,14 +81,13 @@ services:
       dockerfile: Dockerfile
     container_name: notes
     environment:
-      SERVER_PORT: 4001
-      MONGO_DATASOURCE_HOST: mongodb
-      MONGO_DATASOURCE_NAME: patients
-      MONGO_DATASOURCE_PASSWORD: password
-      MONGO_DATASOURCE_PORT: 27017
-      MONGO_DATASOURCE_USERNAME: user
-      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URL: config
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
     depends_on:
+      config:
+        condition: service_healthy
       eureka:
         condition: service_healthy
       mongodb:
@@ -95,10 +101,13 @@ services:
       dockerfile: Dockerfile
     container_name: risk
     environment:
-      SERVER_PORT: 6001
-      API_GATEWAY_URL: http://gateway:8080/
-      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URL: config
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
     depends_on:
+      config:
+        condition: service_healthy
       eureka:
         condition: service_healthy
     networks:
@@ -112,11 +121,13 @@ services:
       context: ./cloud-gateway
       dockerfile: Dockerfile
     environment:
-      SPRING_APPLICATION_PATIENT_URL: http://patients:5001/
-      SPRING_APPLICATION_NOTE_URL: http://notes:4001/
-      SPRING_APPLICATION_RISK_URL: http://risk:6001/
-      SPRING_EUREKA_URL: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URL: config
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
     depends_on:
+      config:
+        condition: service_healthy
       eureka:
         condition: service_healthy
       patients:
@@ -127,6 +138,24 @@ services:
         condition: service_started
     networks:
       - medilabo-network
+  
+  config:
+    container_name: config
+    build:
+      context: ./config.server
+      dockerfile: Dockerfile
+    environment:
+      CONFIG_SERVER_PORT: 9101
+      SPRING_SECURITY_USERNAME: root
+      SPRING_SECURITY_PASSWORD: s3cr3t
+    networks:
+      - medilabo-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9101/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   nextjs:
     build:
