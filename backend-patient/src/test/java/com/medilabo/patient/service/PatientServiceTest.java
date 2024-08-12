@@ -17,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -91,13 +95,17 @@ public class PatientServiceTest {
                 .phone("0654321987")
                 .build();
 
-        when(patientRepository.findAll()).thenReturn(Arrays.asList(patient, anotherPatient));
 
-        List<Patient> patients = patientService.getAllPatients();
+        Page<Patient> patientPage = new PageImpl<>(Arrays.asList(patient, anotherPatient));
+        Pageable pageable = PageRequest.of(0, 10);
 
-        assertThat(patients).hasSize(2).extracting(Patient::getFirstName).contains("Jean", "Marie");
+        when(patientRepository.findAll(pageable)).thenReturn(patientPage);
 
-        verify(patientRepository).findAll();
+        Page<Patient> patients = patientService.getAllPatients(pageable);
+
+        assertThat(patients.getContent()).hasSize(2).extracting(Patient::getFirstName).contains("Jean", "Marie");
+
+        verify(patientRepository).findAll(pageable);
     }
     @Test
     public void testUpdatePatient() {

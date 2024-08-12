@@ -96,10 +96,12 @@ public class PatientControllerIntegrationTest {
         patientRepository.save(anotherPatient);
 
         mockMvc.perform(get("/patients")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("Jean"))
-                .andExpect(jsonPath("$[1].firstName").value("Marie"));
+                .andExpect(jsonPath("$.content[0].firstName").value("Jean"))
+                .andExpect(jsonPath("$.content[1].firstName").value("Marie"));
     }
 
     @Test

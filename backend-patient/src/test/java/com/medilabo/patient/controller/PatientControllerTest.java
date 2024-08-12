@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,6 +26,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -87,14 +89,18 @@ public class PatientControllerTest {
                 .phone("0654321987")
                 .build();
 
-        List<Patient> patients = Arrays.asList(patient, anotherPatient);
-        Mockito.when(patientService.getAllPatients()).thenReturn(patients);
+        Page<Patient> patientPage = new PageImpl<>(Arrays.asList(patient, anotherPatient));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id"));
+
+        Mockito.when(patientService.getAllPatients(pageable)).thenReturn(patientPage);
 
         mockMvc.perform(get("/patients")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("Jean"))
-                .andExpect(jsonPath("$[1].firstName").value("Marie"));
+                .andExpect(jsonPath("$.content[0].firstName").value("Jean"))
+                .andExpect(jsonPath("$.content[1].firstName").value("Marie"));
     }
 
     @Test
