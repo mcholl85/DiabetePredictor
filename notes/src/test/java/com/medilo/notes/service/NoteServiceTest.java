@@ -1,27 +1,26 @@
 package com.medilo.notes.service;
 
-package com.medilo.notes.service;
-
 import com.medilo.notes.model.Note;
 import com.medilo.notes.repository.NoteRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.Arrays;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NoteServiceTest {
+    @Mock
     private NoteRepository noteRepository;
+    @InjectMocks
     private NoteService noteService;
-
-    @BeforeEach
-    void setUp() {
-        noteRepository = Mockito.mock(NoteRepository.class);
-        noteService = new NoteService(noteRepository);
-    }
 
     @Test
     void testGetNotesByPatientId() {
@@ -31,6 +30,9 @@ class NoteServiceTest {
         when(noteRepository.findByPatId(1)).thenReturn(Arrays.asList(note1, note2));
 
         List<Note> notes = noteService.getNotesByPatientId(1);
+
+        verify(noteRepository).findByPatId(1);
+
         assertThat(notes).hasSize(2);
         assertThat(notes).extracting(Note::getNote).contains("Note 1", "Note 2");
     }
@@ -41,6 +43,9 @@ class NoteServiceTest {
         when(noteRepository.insert(any(Note.class))).thenReturn(note);
 
         Note createdNote = noteService.createNote(note);
+
+        verify(noteRepository).insert(any(Note.class));
+
         assertThat(createdNote.getNote()).isEqualTo("New Note");
     }
 }

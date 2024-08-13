@@ -1,14 +1,14 @@
 server:
   port: 4001
 spring:
-  application.name: notes
   data:
     mongodb:
-      host: localhost
-      port: 20017
-      database: patients
-      username: user
-      password: password
+      uri: mongodb://localhost:27017/testdb
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 5.0.14
 eureka:
   client:
     enabled: false
