@@ -3,7 +3,7 @@ eureka:
     enabled: false
 medilabo:
   api:
-    url: http://localhost:8080/patients
+    url: http://localhost:8080/
 risk:
   terms:
     - "Hémoglobine A1C"
@@ -20,3 +20,6 @@ risk:
     - "Anticorps"
 server:
   port: 6002
+spring:
+  main:
+    allow-bean-definition-overriding: true
