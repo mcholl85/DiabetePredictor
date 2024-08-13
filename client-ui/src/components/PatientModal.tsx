@@ -1,15 +1,16 @@
 import {Patient} from "@/types/patients";
-import React, {ReactNode} from "react";
+import React, {Dispatch, ReactNode, SetStateAction} from "react";
 import {Modal} from "flowbite-react";
 import useModal from "@/hooks/useModal";
 
 interface PatientModalProps {
     selectedPatient?: Patient
+    setSelectedPatient: Dispatch<SetStateAction<Patient | undefined>>
     children: ReactNode
 }
 
-const PatientModal: React.FC<PatientModalProps> = ({selectedPatient, children}) => {
-    const {closeModal, isOpen} = useModal(selectedPatient);
+const PatientModal: React.FC<PatientModalProps> = ({selectedPatient, setSelectedPatient, children}) => {
+    const {closeModal, isOpen} = useModal({patient: selectedPatient, setPatient: setSelectedPatient});
 
     return <Modal
         className="bg-gray-900/70"

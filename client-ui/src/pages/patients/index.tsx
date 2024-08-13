@@ -23,13 +23,17 @@ const Home: React.FC = () => {
             </div>
             <br/>
             <PatientsTable setSelectedPatient={setSelectedPatient}/>
-            <PatientModal selectedPatient={selectedPatient}>
-                {selectedPatient && <><RiskDetail patId={selectedPatient.id}/>
-                    <PatientDetail patient={selectedPatient}/>
-                    <NoteDetail
-                        patId={selectedPatient.id}
-                        patient={selectedPatient.lastName}
-                    /></>}
+            <PatientModal selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient}>
+                {selectedPatient && (
+                    <>
+                        <RiskDetail patId={selectedPatient.id}/>
+                        <PatientDetail patient={selectedPatient}/>
+                        <NoteDetail
+                            patId={selectedPatient.id}
+                            patient={selectedPatient.lastName}
+                        />
+                    </>
+                    )}
             </PatientModal>
         </div>
     );

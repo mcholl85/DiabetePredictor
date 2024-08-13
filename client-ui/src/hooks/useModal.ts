@@ -1,7 +1,12 @@
 import { Patient } from '@/types/patients';
-import {useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-const useModal = (patient?: Patient) => {
+interface useModalProps {
+    patient?: Patient;
+    setPatient: Dispatch<SetStateAction<Patient | undefined>>;
+}
+
+const useModal = ({patient, setPatient}: useModalProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -13,7 +18,10 @@ const useModal = (patient?: Patient) => {
     }, [patient]);
 
     const openModal = () => setIsOpen(true);
-    const closeModal = () => setIsOpen(false);
+    const closeModal = () => {
+        setIsOpen(false);
+        setPatient(undefined)
+    }
 
     return {
         isOpen,
