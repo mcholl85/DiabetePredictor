@@ -1,13 +1,20 @@
-import React from 'react';
-import {Button, Table} from 'flowbite-react';
+'use client'
+
+import React, {Dispatch, SetStateAction, useState} from 'react';
+import {Button, Pagination, Spinner, Table} from 'flowbite-react';
 import {Patient} from "@/types/patients";
+import {usePatients} from "@/hooks/usePatients";
 
 interface PatientsTableProps {
-    patients: Patient[] | undefined
-    handleOpenModal: (patient: Patient) => void
+    setSelectedPatient: Dispatch<SetStateAction<Patient | undefined>>
 }
 
-const PatientsTable: React.FC<PatientsTableProps> = ({patients, handleOpenModal}) => {
+const PatientsTable: React.FC<PatientsTableProps> = ({setSelectedPatient}) => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const {data, isLoading} = usePatients(currentPage);
+    const patients: Array<Patient> = data?.content || []
+    const totalPages = data?.totalPages || 0;
+
     return (
         <div className="overflow-x-auto">
             <Table hoverable={true}>
@@ -21,7 +28,16 @@ const PatientsTable: React.FC<PatientsTableProps> = ({patients, handleOpenModal}
                     </Table.HeadCell>
                 </Table.Head>
                 <Table.Body className="divide-y">
-                    {patients?.sort((a,b) => a.id - b.id).map((patient) => (
+                    {isLoading && <Table.Row>
+                        <Table.Cell colSpan={5} className="text-center">
+                            <Spinner
+                                color="info"
+                                aria-label="Center-aligned spinner example"
+                                size="xl"
+                            />
+                        </Table.Cell>
+                    </Table.Row>}
+                    {patients.map((patient) => (
                         <Table.Row key={patient.id} className="bg-white dark:bg-gray-800">
                             <Table.Cell>{patient.firstName}</Table.Cell>
                             <Table.Cell>{patient.lastName}</Table.Cell>
@@ -29,7 +45,7 @@ const PatientsTable: React.FC<PatientsTableProps> = ({patients, handleOpenModal}
                             <Table.Cell>{patient.gender}</Table.Cell>
                             <Table.Cell>
                                 <Button
-                                    onClick={() => handleOpenModal(patient)}
+                                    onClick={() => setSelectedPatient(patient)}
                                     className="font-medium text-white bg-cyan-800 hover:bg-cyan-500"
                                 >
                                     View Details
@@ -39,6 +55,9 @@ const PatientsTable: React.FC<PatientsTableProps> = ({patients, handleOpenModal}
                     ))}
                 </Table.Body>
             </Table>
+            <div className="flex overflow-x-auto sm:justify-center">
+                <Pagination currentPage={currentPage + 1} totalPages={totalPages} onPageChange={setCurrentPage} showIcons/>
+            </div>
         </div>
     );
 };

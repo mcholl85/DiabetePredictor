@@ -1,8 +1,9 @@
 import {Patient} from "@/types/patients";
 import {API_URL} from "@/constants/apiUrl";
+import {Page} from "@/types/page";
 
-const fetchPatients = async (): Promise<Array<Patient>> => {
-    const response = await fetch(`${API_URL}/patients`);
+const fetchPatients = async (page: number): Promise<Page<Patient>> => {
+    const response = await fetch(`${API_URL}/patients?page=${page}`);
 
     if (!response.ok) {
         throw new Error('Network response was not ok');

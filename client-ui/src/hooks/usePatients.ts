@@ -2,10 +2,10 @@ import {Patient} from '@/types/patients';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {addPatient, fetchPatientById, fetchPatients, updatePatient} from "@/api/patient";
 
-const usePatients = () => {
+const usePatients = (page: number) => {
     return useQuery({
-        queryKey: ['patients'],
-        queryFn: fetchPatients,
+        queryKey: ['patients', page],
+        queryFn: () => fetchPatients(page),
     });
 };
 
