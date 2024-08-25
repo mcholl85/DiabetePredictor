@@ -90,6 +90,25 @@ Health checks are configured to ensure critical services are functioning correct
 - Eureka Server: http://localhost:8761/actuator/health
 - Config Server: http://localhost:9101/actuator/health
 
+## Green Code Principles in the Project
+
+### Implemented Green Code Practices
+
+In this project, we have implemented several practices aligned with the principles of Green Code to reduce the overall energy consumption and improve efficiency. These practices focus on minimizing resource waste and optimizing performance across the microservices architecture.
+
+#### 1. Pagination for Efficient Data Retrieval
+We have implemented pagination when retrieving patient data, which significantly reduces the volume of data transferred and processed at any given time. This minimizes memory usage, processing power, and ultimately energy consumption. The pagination is currently applied to the Patients service and could be extended to other areas, such as the Notes service.
+
+#### 2. Caching Mechanism with React Query and Next.js
+On the frontend, we utilize the caching mechanism provided by React Query and Next.js. This reduces the number of network requests by caching previously retrieved data. This not only enhances performance and user experience but also reduces the server load and energy consumption associated with redundant API calls.
+
+#### 3. Scalable Microservices Architecture
+The use of microservices allows for targeted scalability, ensuring that only the necessary services are scaled based on demand, rather than the entire application. This minimizes energy consumption by avoiding the scaling of idle services.
+
+#### 4. Future Enhancements
+In the future, we plan to:
+- Implement pagination for patient notes to further reduce data load and resource consumption.
+- Store the calculated diabetes risk to avoid unnecessary recalculations during every request. This will help in conserving processing power and optimize database queries.
 
 ### Contributing
 
